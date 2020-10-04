@@ -1,0 +1,209 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>ANAC 2015-2020</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3"></script>
+        <script src="https://cdn.jsdelivr.net/npm/moment@2.27.0"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@0.1.1"></script>
+    </head>
+    <body>
+        <div class="page">
+            <div class="topnav">
+                <div class="space"></div>
+                <a id="geral">Geral</a>
+                <a id="dates">Datas</a>
+                <a id="plac">Destinos</a>
+                <a id="companies">Empresas</a>
+                <a id="about">Sobre</a>
+                <div class="space"></div>
+            </div>
+            <div class="content">
+                <div class = "box">
+                    <p>Entre 31 de Dezembro de 2014 e 3 de Agosto de 2020 um total <h1 id="flightCounter1">0</h1> voos foram feitos no Brasil.</p>
+                </div>
+                <div class="trio">
+                    <div class = "box">
+                        <p>Entre os <span id="flightCounter2">0</span> voos que aconteceram no nosso pais <h1 id="delayCounter">0</h1> sofreram atrasos. Um total de <h1 id="delayPercentage">0</h1></p>
+                    </div>
+                    <div class = "box">
+                        <p>Imprevistos acontecem, e na aviação isso não é diferente. <h1 id="cancelledCounter">0</h1> voos tiveram que ser cancelados ao longo desses 5 anos. Um total de: <h1 id="cancelledPercentage">0</h1></p>
+                    </div>
+                    <div class = "box">
+                        <p>A empresa que mais fez voos em território nacional foi a <h1 id="mostUsedCompany"></h1> com um total de <h1 id="mostUsedCompanyFlightCounter">0</h1>voos nacionais e internacionais!</p>
+                    </div>
+                </div>
+                <div class="box">
+                    <p>Gráfico de Voos por Dia</p>
+                    <canvas id="flightGraph"></canvas>
+                </div>
+            </div>
+            <div class="space"></div>
+            <footer>
+                <div>
+                    <p>Feito por: Carolaine, Elian Luz, Euma Santos e Luca Argolo</br>Dúvidas? Mande um email para <a style="color:cornflowerblue" href="mailto:lucaargolo@gmail.com">lucaargolo@gmail.com</a></p>
+                </div>
+                <div class="space"></div>
+                <p>Trabalho de MATA62 (Engenharia de Software)</br>2020.3 - UFBA</p>
+                <p>    </p>
+                <p><a href="https://github.com/Tutorial-Git-Latex/tutorial-git-latex.github.io">
+                    <svg width="40px" height="38px" role="img" viewBox="0 0 24 24">
+                        <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" fill="#FFFFFF"/>
+                    </svg>
+                </a></p>
+            </footer>
+        </div>
+    </body>
+    <script type="module">
+        import { CountUp } from "https://cdn.jsdelivr.net/npm/countup.js@2.0.7/dist/countUp.min.js"
+
+        fetch("data/generated/voosPorEmpresa.json").then(res => res.json()).then(function(json) {
+
+            let totalFlights = 0
+            let mostUsedCompany = null
+            let mostUsedCompanyFlightCount = 0
+            for(let d in json) {
+                totalFlights += json[d]
+                let company = d
+                let companyFlightCount = json[d]
+                if(companyFlightCount > mostUsedCompanyFlightCount) {
+                    mostUsedCompany = company
+                    mostUsedCompanyFlightCount = companyFlightCount
+                }
+            }
+
+            document.getElementById("mostUsedCompany").innerText = mostUsedCompany
+            let mostUsedCompanyFlightCounter = new CountUp('mostUsedCompanyFlightCounter', mostUsedCompanyFlightCount);
+            mostUsedCompanyFlightCounter.start();
+
+            fetch("data/generated/voosAtrasadosPorEmpresa.json").then(res => res.json()).then(function(json) {
+                
+                let voosAtrasados = 0
+                for(let d in json) {
+                    voosAtrasados += json[d]
+                }
+                
+                let delayCounter = new CountUp("delayCounter", voosAtrasados)
+                delayCounter.start();
+                document.getElementById("delayPercentage").innerText = ((voosAtrasados/totalFlights)*100).toFixed(2) + "%"
+
+            })
+
+            fetch("data/generated/voosCanceladosPorEmpresa.json").then(res => res.json()).then(function(json) {
+
+                let voosCancelados = 0
+                for(let d in json) {
+                    voosCancelados += json[d]
+                }
+                
+                let cancelledCounter = new CountUp("cancelledCounter", voosCancelados)
+                cancelledCounter.start();
+                document.getElementById("cancelledPercentage").innerText = ((voosCancelados/totalFlights)*100).toFixed(2) + "%"
+
+            })
+
+        })
+
+        fetch("data/generated/voosPorDia.json").then(res => res.json()).then(function(json) {
+
+            let xs = []
+            let day_ys = []
+            let mean_ys = []
+            let sum_array = []
+            let sum = 0
+            for(let d in json) {
+                sum += json[d]
+                let num = parseInt(d)
+                if(num > 1417392000) { //Check if the date is after 01-12-2014
+                    xs.push(num)
+                    day_ys.push(json[num])
+                    sum_array.unshift(json[num])
+                    if(sum_array.length > 7) {
+                        sum_array.pop()
+                    }
+                    let sum = 0
+                    for(let s in sum_array) {
+                        sum += sum_array[s]
+                    }
+                    mean_ys.push(Math.floor(sum/sum_array.length))
+                }
+            }
+
+            let flightCounter1 = new CountUp('flightCounter1', sum);
+            flightCounter1.start();
+            let flightCounter2 = new CountUp('flightCounter2', sum);
+            flightCounter2.start();
+
+            const ctx = document.getElementById('flightGraph').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'line',
+                responsive: true,
+                data: {
+                    labels: xs,
+                    datasets: [
+                    {
+                        label: 'Média de voos por 7 dias',
+                        data: mean_ys,
+                        backgroundColor: 'rgba(0, 0, 0, 0)',
+                        borderColor: 'rgb(219, 130, 75)',
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0,
+                        pointHitRadius: 3
+                    },
+                    {
+                        label: 'Voos por dia',
+                        data: day_ys,
+                        backgroundColor: 'rgba(0, 0, 0, 0)',
+                        borderColor: 'rgb(75, 183, 219)',
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0,
+                        pointHitRadius: 3
+                    }
+                ]
+                },
+                options: {
+                    legend: {
+                        labels: {
+                            fontColor: "#BBBBBB"
+                        }
+                    },
+                    scales: {
+                        xAxes: [{
+                            type: "time",
+                            time: {
+                                unit: 'month',
+                                tooltipFormat: 'dddd, MMMM Do YYYY'
+                            },
+                            gridLines: {
+                                color: "#BBBBBB"
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Periodo',
+                                fontColor: "#BBBBBB"
+                            },
+                            ticks: {
+                                fontColor: "#BBBBBB",
+                            }
+                        }],
+                        yAxes: [{
+                            gridLines: {
+                                color: "#BBBBBB"
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Quantidade de Voos',
+                                fontColor: "#BBBBBB"
+                            },
+                            ticks: {
+                                fontColor: "#BBBBBB"
+                            }
+                        }]
+                    }
+                }
+            });
+        })
+    </script>
+</html>
