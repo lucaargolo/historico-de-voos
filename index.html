@@ -4,13 +4,14 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>ANAC 2015-2020</title>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3"></script>
-        <script src="https://cdn.jsdelivr.net/npm/moment@2.27.0"></script>
+        <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1"></script>
+        <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/locale/pt-br.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@0.1.1"></script>
     </head>
     <body>
         <div class="page">
             <div class="topnav" id="topnav">
-                <a href="index.html">Geral</a>
+                <a href="index.html" class="selected">Geral</a>
                 <a href="dates.html">Datas</a>
                 <a href="destinations.html">Destinos</a>
                 <a href="companies.html">Empresas</a>
@@ -22,7 +23,7 @@
                 <div class = "box">
                     <p>Entre 31 de Dezembro de 2014 e 3 de Agosto de 2020 um total <h1 id="flightCounter1">0</h1> voos foram registrados no Brasil.</p>
                 </div>
-                <div class="trio">
+                <div class="group">
                     <div class = "box">
                         <p>Entre os <span id="flightCounter2">0</span> voos que aconteceram no nosso pais <h1 id="delayCounter">0</h1> sofreram atrasos. Um total de <h1 id="delayPercentage">0</h1></p>
                     </div>
@@ -54,16 +55,7 @@
             </footer>
         </div>
     </body>
-    <script>
-        function collapseTopNav() {
-            var x = document.getElementById("topnav");
-            if (x.className === "topnav") {
-                x.className += " responsive";
-            } else {
-                x.className = "topnav";
-            }
-        }
-    </script>
+    <script src="common.js"></script>
     <script type="module">
         import { CountUp } from "https://cdn.jsdelivr.net/npm/countup.js@2.0.7/dist/countUp.min.js"
 
@@ -144,76 +136,7 @@
             let flightCounter2 = new CountUp('flightCounter2', sum);
             flightCounter2.start();
 
-            const ctx = document.getElementById('flightGraph').getContext('2d');
-            const chart = new Chart(ctx, {
-                type: 'line',
-                responsive: true,
-                data: {
-                    labels: xs,
-                    datasets: [
-                    {
-                        label: 'Média de voos por 7 dias',
-                        data: mean_ys,
-                        backgroundColor: 'rgba(0, 0, 0, 0)',
-                        borderColor: 'rgb(219, 130, 75)',
-                        borderWidth: 2,
-                        fill: false,
-                        pointRadius: 0,
-                        pointHitRadius: 3
-                    },
-                    {
-                        label: 'Voos por dia',
-                        data: day_ys,
-                        backgroundColor: 'rgba(0, 0, 0, 0)',
-                        borderColor: 'rgb(75, 183, 219)',
-                        borderWidth: 2,
-                        fill: false,
-                        pointRadius: 0,
-                        pointHitRadius: 3
-                    }
-                ]
-                },
-                options: {
-                    legend: {
-                        labels: {
-                            fontColor: "#BBBBBB"
-                        }
-                    },
-                    scales: {
-                        xAxes: [{
-                            type: "time",
-                            time: {
-                                unit: 'month',
-                                tooltipFormat: 'dddd, MMMM Do YYYY'
-                            },
-                            gridLines: {
-                                color: "#BBBBBB"
-                            },
-                            scaleLabel: {
-                                display: true,
-                                labelString: 'Periodo',
-                                fontColor: "#BBBBBB"
-                            },
-                            ticks: {
-                                fontColor: "#BBBBBB",
-                            }
-                        }],
-                        yAxes: [{
-                            gridLines: {
-                                color: "#BBBBBB"
-                            },
-                            scaleLabel: {
-                                display: true,
-                                labelString: 'Quantidade de Voos',
-                                fontColor: "#BBBBBB"
-                            },
-                            ticks: {
-                                fontColor: "#BBBBBB"
-                            }
-                        }]
-                    }
-                }
-            });
+            createFlightGraph("flightGraph", xs, mean_ys, day_ys)
         })
     </script>
 </html>

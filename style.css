@@ -63,11 +63,17 @@ footer p {
     align-self: center;
 }
 
-.trio {
+.group {
     display: flex;
     flex-direction: row;
+    justify-content: center;
     align-self: center;
     width: 100%;
+}
+
+.date {
+    margin: 10px;
+    padding: 10px;
 }
 
 /*Topnav && Responsiveness*/
@@ -96,9 +102,9 @@ footer p {
     color: black;
 }
 
-.topnav a.active {
-    background-color: rgba(0, 0, 0, 0);
-    color: white;
+.topnav a.selected {
+    background-color: #ddd;
+    color: black;
 }
 
 .topnav .space {
@@ -110,7 +116,7 @@ footer p {
 }
 
 @media (max-width: 650px) {
-    .trio {
+    .group {
         flex-direction: column;
     }
 
@@ -123,7 +129,7 @@ footer p {
         justify-content: left;
     }
 
-    .topnav a:not(:first-child) {
+    .topnav a:not(.selected) {
         display: none;
     }
     

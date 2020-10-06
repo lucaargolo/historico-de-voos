@@ -168,10 +168,29 @@ function parseCsvLine(csvLine, lineNumber) {
 }
 
 //Objetos para separar as informações dos voos
+let voosPorEmpresa = {}
 let voosCanceladosPorEmpresa = {}
 let voosAtrasadosPorEmpresa = {}
 let voosPorDia = {}
-let voosPorEmpresa = {}
+let voosPorEmpresaDia = {}
+
+let voosPorOrigem = {}
+let voosPorOrigemDia = {}
+let voosCanceladosPorOrigem = {}
+let voosAtrasadosPorOrigem = {}
+let voosPorEmpresaOrigem = {}
+
+let voosPorDestino = {}
+let voosPorDestinoDia = {}
+let voosCanceladosPorDestino = {}
+let voosAtrasadosPorDestino = {}
+let voosPorEmpresaDestino = {}
+
+let voosPorRota = {}
+let voosPorRotaDia = {}
+let voosCanceladosPorRota = {}
+let voosAtrasadosPorRota = {}
+let voosPorEmpresaRota = {}
 
 //Função que recebe o objeto voo e separa suas informações nos modelos definidos pelo grupo
 function handleVoo(voo) {
@@ -189,11 +208,78 @@ function handleVoo(voo) {
         voosPorDia[dayDate.getTime()] = 0
     }
     voosPorDia[dayDate.getTime()]++
-    
+
+    let origem = voo.icaoOrigem
+    if(isNaN(voosPorOrigem[origem])) {
+        voosPorOrigem[origem] = 0
+        if(voosPorOrigemDia[origem] == null) {
+            voosPorOrigemDia[origem] = {}
+        }
+    }
+    if(isNaN(voosPorOrigemDia[origem][dayDate.getTime()])) {
+        voosPorOrigemDia[origem][dayDate.getTime()] = 0
+    }
+    voosPorOrigemDia[origem][dayDate.getTime()]++
+    voosPorOrigem[origem]++
+
+    let destino = voo.icaoDestino
+    if(isNaN(voosPorDestino[destino])) {
+        voosPorDestino[destino] = 0
+        if(voosPorDestinoDia[destino] == null) {
+            voosPorDestinoDia[destino] = {}
+        }
+    }
+    if(isNaN(voosPorDestinoDia[destino][dayDate.getTime()])) {
+        voosPorDestinoDia[destino][dayDate.getTime()] = 0
+    }
+    voosPorDestinoDia[destino][dayDate.getTime()]++
+    voosPorDestino[destino]++
+
+    let rota = origem+"-"+destino
+    if(isNaN(voosPorRota[rota])) {
+        voosPorRota[rota] = 0
+        if(voosPorRotaDia[rota] == null) {
+            voosPorRotaDia[rota] = {}
+        }
+    }
+    if(isNaN(voosPorRotaDia[rota][dayDate.getTime()])) {
+        voosPorRotaDia[rota][dayDate.getTime()] = 0
+    }
+    voosPorRotaDia[rota][dayDate.getTime()]++
+    voosPorRota[rota]++
+
     let empresa = voo.icaoEmpresa
     if(isNaN(voosPorEmpresa[empresa])) {
         voosPorEmpresa[empresa] = 0
+        if(voosPorEmpresaDia[empresa] == null) {
+            voosPorEmpresaDia[empresa] = {}
+        }
+        if(voosPorEmpresaOrigem[empresa] == null) {
+            voosPorEmpresaOrigem[empresa] = {}
+        }
+        if(voosPorEmpresaDestino[empresa] == null) {
+            voosPorEmpresaDestino[empresa] = {}
+        }
+        if(voosPorEmpresaRota[empresa] == null) {
+            voosPorEmpresaRota[empresa] = {}
+        }
     }
+    if(isNaN(voosPorEmpresaDia[empresa][dayDate.getTime()])) {
+        voosPorEmpresaDia[empresa][dayDate.getTime()] = 0
+    }
+    voosPorEmpresaDia[empresa][dayDate.getTime()]++
+    if(isNaN(voosPorEmpresaOrigem[empresa][origem])) {
+        voosPorEmpresaOrigem[empresa][origem] = 0
+    }
+    voosPorEmpresaOrigem[empresa][origem]++
+    if(isNaN(voosPorEmpresaDestino[empresa][destino])) {
+        voosPorEmpresaDestino[empresa][destino] = 0
+    }
+    voosPorEmpresaDestino[empresa][destino]++
+    if(isNaN(voosPorEmpresaRota[empresa][rota])) {
+        voosPorEmpresaRota[empresa][rota] = 0
+    }
+    voosPorEmpresaRota[empresa][rota]++
     voosPorEmpresa[empresa]++
 
     if(voo.situacaoVoo == "CANCELADO") {
@@ -201,6 +287,18 @@ function handleVoo(voo) {
             voosCanceladosPorEmpresa[empresa] = 0
         }
         voosCanceladosPorEmpresa[empresa]++
+        if(isNaN(voosCanceladosPorOrigem[origem])) {
+            voosCanceladosPorOrigem[origem] = 0
+        }
+        voosCanceladosPorOrigem[origem]++
+        if(isNaN(voosCanceladosPorDestino[destino])) {
+            voosCanceladosPorDestino[destino] = 0
+        }
+        voosCanceladosPorDestino[destino]++
+        if(isNaN(voosCanceladosPorRota[rota])) {
+            voosCanceladosPorRota[rota] = 0
+        }
+        voosCanceladosPorRota[rota]++
     }
     
     if(voo.chegadaReal > voo.chegadaPrevista) {
@@ -208,6 +306,18 @@ function handleVoo(voo) {
             voosAtrasadosPorEmpresa[empresa] = 0
         }
         voosAtrasadosPorEmpresa[empresa]++
+        if(isNaN(voosAtrasadosPorOrigem[origem])) {
+            voosAtrasadosPorOrigem[origem] = 0
+        }
+        voosAtrasadosPorOrigem[origem]++
+        if(isNaN(voosAtrasadosPorDestino[destino])) {
+            voosAtrasadosPorDestino[destino] = 0
+        }
+        voosAtrasadosPorDestino[destino]++
+        if(isNaN(voosAtrasadosPorRota[rota])) {
+            voosAtrasadosPorRota[rota] = 0
+        }
+        voosAtrasadosPorRota[rota]++
     }
 }
 
@@ -256,3 +366,19 @@ writeObject(voosPorDiaSorted, "voosPorDia.json")
 writeObject(voosPorEmpresa, "voosPorEmpresa.json")
 writeObject(voosAtrasadosPorEmpresa, "voosAtrasadosPorEmpresa.json")
 writeObject(voosCanceladosPorEmpresa, "voosCanceladosPorEmpresa.json")
+writeObject(voosPorEmpresaDia, "voosPorEmpresaDia.json")
+writeObject(voosPorOrigem, "voosPorOrigem.json")
+writeObject(voosPorOrigemDia, "voosPorOrigemDia.json")
+writeObject(voosCanceladosPorOrigem, "voosCanceladosPorOrigem.json")
+writeObject(voosAtrasadosPorOrigem, "voosAtrasadosPorOrigem.json")
+writeObject(voosPorEmpresaOrigem, "voosPorEmpresaOrigem.json")
+writeObject(voosPorDestino, "voosPorDestino.json")
+writeObject(voosPorDestinoDia, "voosPorDestinoDia.json")
+writeObject(voosCanceladosPorDestino, "voosCanceladosPorDestino.json")
+writeObject(voosAtrasadosPorDestino, "voosAtrasadosPorDestino.json")
+writeObject(voosPorEmpresaDestino, "voosPorEmpresaDestino.json")
+writeObject(voosPorRota, "voosPorRota.json")
+writeObject(voosPorRotaDia, "voosPorRotaDia.json")
+writeObject(voosCanceladosPorRota, "voosCanceladosPorRota.json")
+writeObject(voosAtrasadosPorRota, "voosAtrasadosPorRota.json")
+writeObject(voosPorEmpresaRota, "voosPorEmpresaRota.json")
