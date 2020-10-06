@@ -23,38 +23,6 @@ body {
     overflow: scroll;
 }
 
-.topnav {
-    flex-grow: 0;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-}
-
-.topnav .space {
-    background-color: rgba(51, 51, 51, 0.867);
-}
-  
-.topnav a {
-    float: left;
-    color: #f2f2f2;
-    text-align: center;
-    padding: 10px 15px;
-    text-decoration: none;
-    background-color: rgba(47, 47, 47, 0.98);
-    font-size: 17px;
-}
-
-.topnav a:hover {
-    cursor: pointer;
-    background-color: #ddd;
-    color: black;
-}
-
-.topnav a.active {
-    background-color: rgba(0, 0, 0, 0);
-    color: white;
-}
-
 footer {
     flex-grow: 0;
     background: rgba(0, 0, 0, 0.867);
@@ -102,14 +70,84 @@ footer p {
     width: 100%;
 }
 
-@media (max-width: 1000px) {
-    .content {
-        width: 100%;
-    }
+/*Topnav && Responsiveness*/
+
+.topnav {
+    flex-grow: 0;
+    width: 100%;
+    display: flex;
+    background-color: rgba(51, 51, 51, 0.867);
+    justify-content: center;
+}
+  
+.topnav a {
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 10px 15px;
+    text-decoration: none;
+    background-color: rgba(47, 47, 47, 0.98);
+    font-size: 17px;
+}
+
+.topnav a:hover {
+    cursor: pointer;
+    background-color: #ddd;
+    color: black;
+}
+
+.topnav a.active {
+    background-color: rgba(0, 0, 0, 0);
+    color: white;
+}
+
+.topnav .space {
+    display: none;
+}
+
+.topnav .collapse {
+    display: none;
 }
 
 @media (max-width: 650px) {
     .trio {
         flex-direction: column;
+    }
+
+    footer {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .topnav {
+        justify-content: left;
+    }
+
+    .topnav a:not(:first-child) {
+        display: none;
+    }
+    
+    .topnav a.collapse {
+        display: block;
+    }
+
+    .topnav .space {
+        display: block;
+    }
+
+    .topnav.responsive {
+        flex-direction: column;
+    }
+  
+    .topnav.responsive a {
+        display: block;
+        text-align: left;
+    }
+    
+}
+
+@media (max-width: 1000px) {
+    .content {
+        width: 100%;
     }
 }
