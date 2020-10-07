@@ -1,3 +1,46 @@
+function getRandomColor() {
+    return "hsl(" + 360 * Math.random() + ',' +
+        (60 + 40 * Math.random()) + '%,' +
+        (60 + 5 * Math.random()) + '%)'
+}
+
+function getMostCommon(object) {
+    let mostCommon = "", mostCommonQnt = 0;
+    for(let o in object) {
+        if(!object.hasOwnProperty(o)) continue;
+        if(object[o] > mostCommonQnt) {
+            mostCommonQnt = object[o]
+            mostCommon = o
+        }
+    }
+    return [mostCommon, mostCommonQnt]
+}
+
+function createPie(elementId, data, color, labels) {
+    const ctx = document.getElementById(elementId).getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: data,
+                backgroundColor: color,
+                borderColor: color,
+                label: 'Dados'
+            }],
+            labels: labels
+        },
+        options: {
+            legend: {
+                labels: {
+                    fontColor: "#BBBBBB"
+                }
+            },
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    })
+}
+
 function createFlightGraph(elementId, xs, mean_ys, day_ys) {
     const ctx = document.getElementById(elementId).getContext('2d');
     const chart = new Chart(ctx, {

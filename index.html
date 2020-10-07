@@ -32,15 +32,27 @@
                         <p>Imprevistos acontecem, e na aviação isso não é diferente. <span class="counter" id="cancelledCounter">0</span> voos tiveram que ser cancelados ao longo desses 5 anos. Um total de: <span class="counter" id="cancelledPercentage">0</span></p>
                     </div>
                     <div class = "box">
-                        <p>A empresa que mais fez voos em território nacional foi a <span class="counter" id="mostUsedCompany"></span> com um total de <span class="counter" id="mostUsedCompanyFlightCounter">0</span>voos nacionais e internacionais!</p>
+                        <p>O rota que apresentou mais atrasos foi <span class="counter" id="mostDelayedRoute"></span> O aeroporto com mais atrasos foi <span class="counter" id="mostDelayedAirport"></span> A empresa com mais atrasos foi <span class="counter" id="mostDelayedCompany"></span></p>
+                    </div>
+                </div>
+                <div class = "box">
+                    <p>A empresa que fez mais voos em território nacional foi a <span style="font-weight: bold" id="mostUsedCompany"></span> com um total de <span style="font-weight: bold" id="mostUsedCompanyFlightCounter">0</span> voos!</p>
+                    <div style="height: 300px">
+                        <canvas id="companyPie"></canvas>
                     </div>
                 </div>
                 <div class="group">
                     <div class = "box">
-                        <p>O aeroporto mais movimentado do brasil durante esse periodo foi <span class="counter" id="mostUsedAirport"></span> com um total de <span class="counter" id="mostUsedAirportFlightCounter">0</span> voos realizados.</p>
+                        <p>O aeroporto mais movimentado do brasil durante esse periodo foi <span class="counter" id="mostUsedAirport"></span> com um total de <span style="font-weight: bold" id="mostUsedAirportDepartureCounter">0</span> voos partindo e <span style="font-weight: bold" id="mostUsedAirportArrivalCounter">0</span> voos chegando.</p>
+                        <div style="height: 300px">
+                            <canvas id="airportPie"></canvas>
+                        </div>
                     </div>
                     <div class = "box">
-                        <p>O rota mais utilizada foi <span class="counter" id="mostUsedRoute"></span> com um total de <span class="counter" id="mostUsedRouteFlightCounter">0</span> voos realizados.</p>
+                        <p>O rota mais movimentada foi <span class="counter" id="mostUsedRoute"></span> com um total de <span style="font-weight: bold" id="mostUsedRouteFlightCounter">0</span> voos realizados.</p>
+                        <div style="height: 300px">
+                            <canvas id="routePie"></canvas>
+                        </div>
                     </div>
                 </div>
                 <div class="box">
@@ -75,9 +87,11 @@
             let mostUsedCompany = null
             let mostUsedCompanyFlightCount = 0
 
+            let companyFlights = []
             for(let d in json) {
                 if(!json.hasOwnProperty(d)) continue;
                 totalFlights += json[d]
+                companyFlights.push(json[d])
                 let company = d
                 let companyFlightCount = json[d]
                 if(companyFlightCount > mostUsedCompanyFlightCount) {
@@ -86,20 +100,46 @@
                 }
             }
 
+            companyFlights.sort((a, b) => parseInt(b) - parseInt(a))
+            let otherFlights = companyFlights.splice(9, companyFlights.length-10)
+            let otherSum = 0
+            for(let o in otherFlights) {
+                otherSum += otherFlights[o]
+            }
+            let companyArray = []
+            let companyColors = []
+            for(let f in companyFlights) {
+                companyColors.push(getRandomColor())
+                let c = Object.keys(json).find(key => json[key] === companyFlights[f]);
+                companyArray.push(c)
+            }
+            companyColors.push("#444444")
+            companyArray.push("Outros")
+            companyFlights.push(otherSum)
+
+            createPie("companyPie", companyFlights, companyColors, companyArray)
+
             document.getElementById("mostUsedCompany").innerText = mostUsedCompany
             let mostUsedCompanyFlightCounter = new CountUp('mostUsedCompanyFlightCounter', mostUsedCompanyFlightCount);
             mostUsedCompanyFlightCounter.start();
 
             fetch("data/generated/voosAtrasadosPorEmpresa.json").then(res => res.json()).then(function(json) {
-                
+
+                let mostDelayedCompany = "", mostDelayedCompanyQnt = 0;
                 let voosAtrasados = 0
                 for(let d in json) {
-                    if(json.hasOwnProperty(d))
-                        voosAtrasados += json[d]
+                    if(!json.hasOwnProperty(d)) continue;
+                    voosAtrasados += json[d]
+                    if(json[d] > mostDelayedCompanyQnt) {
+                        mostDelayedCompanyQnt = json[d]
+                        mostDelayedCompany = d
+                    }
                 }
                 
                 let delayCounter = new CountUp("delayCounter", voosAtrasados)
                 delayCounter.start();
+
+                document.getElementById("mostDelayedCompany").innerText = mostDelayedCompany
                 document.getElementById("delayPercentage").innerText = ((voosAtrasados/totalFlights)*100).toFixed(2) + "%"
 
             })
@@ -118,6 +158,82 @@
 
             })
 
+        })
+
+        fetch("data/generated/voosAtrasadosPorRota.json").then(res => res.json()).then(function(json) {
+            document.getElementById("mostDelayedRoute").innerText = getMostCommon(json)[0]
+        })
+
+        fetch("data/generated/voosAtrasadosPorOrigem.json").then(res => res.json()).then(function(json) {
+            document.getElementById("mostDelayedAirport").innerText = getMostCommon(json)[0]
+        })
+
+        fetch("data/generated/voosPorRota.json").then(res => res.json()).then(function(json) {
+            let routeFlights = Object.values(json)
+            routeFlights.sort((a, b) => parseInt(b.toString()) - parseInt(a.toString()))
+            let otherFlights = routeFlights.splice(9, routeFlights.length-10)
+            let otherSum = 0
+            for(let o in otherFlights) {
+                otherSum += otherFlights[o]
+            }
+            let routeArray = []
+            let routeColors = []
+            for(let f in routeFlights) {
+                routeColors.push(getRandomColor())
+                let c = Object.keys(json).find(key => json[key] === routeFlights[f]);
+                routeArray.push(c)
+            }
+            routeColors.push("#444444")
+            routeArray.push("Outros")
+            routeFlights.push(otherSum)
+
+            createPie("routePie", routeFlights, routeColors, routeArray)
+
+            let mostCommon = getMostCommon(json);
+            document.getElementById("mostUsedRoute").innerText = mostCommon[0]
+            new CountUp('mostUsedRouteFlightCounter', mostCommon[1]).start();
+        })
+
+        fetch("data/generated/voosPorOrigem.json").then(res => res.json()).then(function(departureJson) {
+            let json = {}
+            for(let v in departureJson) {
+                if(!departureJson.hasOwnProperty(v)) continue;
+                json[v] = departureJson[v]
+            }
+            fetch("data/generated/voosPorDestino.json").then(res => res.json()).then(function(arrivalJson) {
+                for(let v in arrivalJson) {
+                    if(!arrivalJson.hasOwnProperty(v)) continue;
+                    if(isNaN(json[v])) {
+                        json[v] = 0;
+                    }
+                    json[v] += arrivalJson[v]
+                }
+
+                let airportFlights = Object.values(json)
+                airportFlights.sort((a, b) => parseInt(b.toString()) - parseInt(a.toString()))
+                let otherFlights = airportFlights.splice(9, airportFlights.length-10)
+                let otherSum = 0
+                for(let o in otherFlights) {
+                    otherSum += otherFlights[o]
+                }
+                let airportArray = []
+                let airportColors = []
+                for(let f in airportFlights) {
+                    airportColors.push(getRandomColor())
+                    let c = Object.keys(json).find(key => json[key] === airportFlights[f]);
+                    airportArray.push(c)
+                }
+                airportColors.push("#444444")
+                airportArray.push("Outros")
+                airportFlights.push(otherSum)
+
+                createPie("airportPie", airportFlights, airportColors, airportArray)
+
+                let airport = getMostCommon(json)[0]
+                document.getElementById("mostUsedAirport").innerText = airport
+                new CountUp('mostUsedAirportDepartureCounter', departureJson[airport]).start();
+                new CountUp('mostUsedAirportArrivalCounter', arrivalJson[airport]).start();
+            })
         })
 
         fetch("data/generated/voosPorDia.json").then(res => res.json()).then(function(json) {
@@ -140,6 +256,7 @@
                     }
                     let sum = 0
                     for(let s in sum_array) {
+                        if(!sum_array.hasOwnProperty(s)) continue;
                         sum += sum_array[s]
                     }
                     mean_ys.push(Math.floor(sum/sum_array.length))
