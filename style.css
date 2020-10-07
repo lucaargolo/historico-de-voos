@@ -68,9 +68,20 @@ footer p {
     width: 100%;
 }
 
-.date {
-    margin: 10px;
-    padding: 10px;
+.group label {
+    display: flex;
+    align-items: center;
+}
+
+.group input {
+    background-color: rgba(0, 0, 0, 0.4);
+    color: white;
+    margin: 5px;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    outline: none;
 }
 
 .counter {

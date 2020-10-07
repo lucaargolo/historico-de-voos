@@ -89,7 +89,7 @@ function createFlightGraph(elementId, xs, mean_ys, day_ys) {
                     },
                     scaleLabel: {
                         display: true,
-                        labelString: 'Periodo',
+                        labelString: 'Período',
                         fontColor: "#BBBBBB"
                     },
                     ticks: {

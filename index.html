@@ -14,7 +14,7 @@
             <div class="topnav" id="topnav">
                 <a href="index.html" class="selected">Geral</a>
                 <a href="dates.html">Datas</a>
-                <a href="destinations.html">Destinos</a>
+                <a href="airports.html">Aeroportos</a>
                 <a href="companies.html">Empresas</a>
                 <a href="about.html">Sobre</a>
                 <div class="space"></div>
@@ -29,7 +29,7 @@
                         <p>Entre os <span id="flightCounter2">0</span> voos que aconteceram no nosso pais <span class="counter" id="delayCounter">0</span> sofreram atrasos. Um total de <span class="counter" id="delayPercentage">0</span></p>
                     </div>
                     <div class = "box">
-                        <p>Imprevistos acontecem, e na aviação isso não é diferente. <span class="counter" id="cancelledCounter">0</span> voos tiveram que ser cancelados ao longo desses 5 anos. Um total de: <span class="counter" id="cancelledPercentage">0</span></p>
+                        <p>Imprevistos acontecem, e na aviação isso não é diferente. <span class="counter" id="cancelledCounter">0</span> voos tiveram que ser cancelados durante esse período. Um total de: <span class="counter" id="cancelledPercentage">0</span></p>
                     </div>
                     <div class = "box">
                         <p>O rota que apresentou mais atrasos foi <span class="counter" id="mostDelayedRoute"></span> O aeroporto com mais atrasos foi <span class="counter" id="mostDelayedAirport"></span> A empresa com mais atrasos foi <span class="counter" id="mostDelayedCompany"></span></p>
@@ -43,7 +43,7 @@
                 </div>
                 <div class="group">
                     <div class = "box">
-                        <p>O aeroporto mais movimentado do brasil durante esse periodo foi <span class="counter" id="mostUsedAirport"></span> com um total de <span style="font-weight: bold" id="mostUsedAirportDepartureCounter">0</span> voos partindo e <span style="font-weight: bold" id="mostUsedAirportArrivalCounter">0</span> voos chegando.</p>
+                        <p>O aeroporto mais movimentado do brasil durante esse período foi <span class="counter" id="mostUsedAirport"></span> com um total de <span style="font-weight: bold" id="mostUsedAirportDepartureCounter">0</span> voos partindo e <span style="font-weight: bold" id="mostUsedAirportArrivalCounter">0</span> voos chegando.</p>
                         <div style="height: 300px">
                             <canvas id="airportPie"></canvas>
                         </div>
@@ -101,7 +101,7 @@
             }
 
             companyFlights.sort((a, b) => parseInt(b) - parseInt(a))
-            let otherFlights = companyFlights.splice(9, companyFlights.length-10)
+            let otherFlights = companyFlights.splice(9, companyFlights.length-9)
             let otherSum = 0
             for(let o in otherFlights) {
                 otherSum += otherFlights[o]
@@ -109,6 +109,7 @@
             let companyArray = []
             let companyColors = []
             for(let f in companyFlights) {
+                if(!companyFlights.hasOwnProperty(f)) continue;
                 companyColors.push(getRandomColor())
                 let c = Object.keys(json).find(key => json[key] === companyFlights[f]);
                 companyArray.push(c)
@@ -171,9 +172,10 @@
         fetch("data/generated/voosPorRota.json").then(res => res.json()).then(function(json) {
             let routeFlights = Object.values(json)
             routeFlights.sort((a, b) => parseInt(b.toString()) - parseInt(a.toString()))
-            let otherFlights = routeFlights.splice(9, routeFlights.length-10)
+            let otherFlights = routeFlights.splice(9, routeFlights.length-9)
             let otherSum = 0
             for(let o in otherFlights) {
+                if(!otherFlights.hasOwnProperty(o)) continue;
                 otherSum += otherFlights[o]
             }
             let routeArray = []
@@ -211,7 +213,7 @@
 
                 let airportFlights = Object.values(json)
                 airportFlights.sort((a, b) => parseInt(b.toString()) - parseInt(a.toString()))
-                let otherFlights = airportFlights.splice(9, airportFlights.length-10)
+                let otherFlights = airportFlights.splice(9, airportFlights.length-9)
                 let otherSum = 0
                 for(let o in otherFlights) {
                     otherSum += otherFlights[o]

@@ -9,13 +9,13 @@
         <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/locale/pt-br.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@0.1.1"></script>
         <script>
-            fetch("data/icao_companies.json").then(res => res.json()).then(function(json) {
+            fetch("data/icao_airports.json").then(res => res.json()).then(function(json) {
                 let str = ""
                 for(let j in json) {
                     if(!json.hasOwnProperty(j)) continue;
-                    str += "<option value='"+j+"' label='"+json[j]["Airline"]+"' />\n"
+                    str += "<option value='"+j+"' label='"+json[j]["description"]+"' />\n"
                 }
-                document.getElementById("companies").innerHTML = str
+                document.getElementById("airports").innerHTML = str
             })
         </script>
     </head>
@@ -24,41 +24,43 @@
             <div class="topnav" id="topnav">
                 <a href="index.html">Geral</a>
                 <a href="dates.html">Datas</a>
-                <a href="airports.html">Aeroportos</a>
-                <a href="companies.html" class="selected">Empresas</a>
+                <a href="airports.html" class="selected">Aeroportos</a>
+                <a href="companies.html">Empresas</a>
                 <a href="about.html">Sobre</a>
                 <div class="space"></div>
                 <a class="collapse" onclick="collapseTopNav()">...</a>
             </div>
             <div class="content">
                 <div class="box" id="date_box">
-                    <p>Por favor selecione a empresa que deseja consultar:</p>
-                    <datalist id="companies"></datalist>
-                    <form action="companies.html" method="get" class="group">
-                        <label for="company">Empresa: </label>
-                        <input list="companies" name="company" id="company" >
+                    <p>Por favor selecione o aeroporto/rota que deseja consultar:</p>
+                    <datalist id="airports"></datalist>
+                    <form action="airports.html" method="get" class="group">
+                        <label for="departure">Partida: </label>
+                        <input list="airports" name="departure" id="departure" >
+                        <label for="arrival">Destino: </label>
+                        <input list="airports" name="arrival" id="arrival">
                         <input type="submit" value="Consultar">
                     </form>
                 </div>
                 <div id="content_box" style="display: none;">
                     <div class="group">
-                        <div class="box">
-                            <h2>Ficha técnica da Empresa</h2>
-                            <p>ICAO <span class="counter" id="icao">N/A</span></p>
-                            <p>Nome <span class="counter" id="name">N/A</span></p>
-                            <p>País <span class="counter" id="country">N/A</span></p>
+                        <div class="box" id="departure_box" style="display: none;">
+                            <h2>Ficha técnica do Aeroporto de Partida</h2>
+                            <p>ICAO <span class="counter" id="icao_departure">N/A</span></p>
+                            <p>Nome <span class="counter" id="name_departure">N/A</span></p>
+                            <p>País <span class="counter" id="country_departure">N/A</span></p>
+                        </div>
+                        <div class="box" id="arrival_box" style="display: none;">
+                            <h2>Ficha técnica do Aeroporto de Chegada</h2>
+                            <p>ICAO <span class="counter" id="icao_arrival">N/A</span></p>
+                            <p>Nome <span class="counter" id="name_arrival">N/A</span></p>
+                            <p>País <span class="counter" id="country_arrival">N/A</span></p>
                         </div>
                         <div class="box">
                             <h2>Informações importantes</h2>
                             <p>Quantidade de voos registrados <span class="counter" id="flights">N/A</span></p>
                             <p>Quantidade de voos atrasados <span class="counter" id="delayedFlights">N/A</span> <span style="font-weight: bold" id="delayedFlightsPercentage"></span></p>
                             <p>Quantidade de voos cancelados <span class="counter" id="cancelledFlights">N/A</span> <span style="font-weight: bold" id="cancelledFlightsPercentage"></span></p>
-                        </div>
-                        <div class="box">
-                            <h2>Informações importantes</h2>
-                            <p>Partida mais comum <span class="counter" id="departure">N/A</span> <span style="font-weight: bold" id="departureFlights"></span></p>
-                            <p>Destino mais comum <span class="counter" id="arrival">N/A</span> <span style="font-weight: bold" id="arrivalFlights"></span></p>
-                            <p>Rota mais comum <span class="counter" id="route">N/A</span> <span style="font-weight: bold" id="routeFlights"></span></p>
                         </div>
                     </div>
                     <div class="box">
@@ -89,24 +91,54 @@
         import { CountUp } from "https://cdn.jsdelivr.net/npm/countup.js@2.0.7/dist/countUp.min.js"
 
         const url = new URL(window.location.href);
-        const company = url.searchParams.get("company");
+        const departure = url.searchParams.get("departure");
+        const arrival = url.searchParams.get("arrival");
 
-        if(company != null && company.length === 3) {
+        if((departure != null && departure.length === 4) || (arrival != null && arrival.length === 4)) {
             document.getElementById("date_box").style = "display: none;"
             document.getElementById("content_box").style = "display: flex; flex-direction: column;"
 
-            fetch("data/icao_companies.json").then(res => res.json()).then(function(json) {
-                document.getElementById("icao").innerText = company
-                document.getElementById("name").innerText = json[company]["Airline"]
-                document.getElementById("country").innerText = json[company]["Country/Region"]
+            let dep = (departure != null && departure.length === 4)
+            if(dep) {
+                document.getElementById("departure_box").style = "display: block;"
+            }
+            let arr = (arrival != null && arrival.length === 4)
+            if(arr) {
+                document.getElementById("arrival_box").style = "display: block;"
+            }
+
+            fetch("data/icao_airports.json").then(res => res.json()).then(function(json) {
+                document.getElementById("icao_departure").innerText = departure
+                if(json.hasOwnProperty(departure)) {
+                    document.getElementById("name_departure").innerText = json[departure]["description"]
+                    document.getElementById("country_departure").innerText = json[departure]["country"]
+                }
+                document.getElementById("icao_arrival").innerText = arrival
+                if(json.hasOwnProperty(arrival)) {
+                    document.getElementById("name_arrival").innerText = json[arrival]["description"]
+                    document.getElementById("country_arrival").innerText = json[arrival]["country"]
+                }
             })
 
-            fetch("data/generated/voosPorEmpresaDia.json").then(res => res.json()).then(function(json) {
-                let flights = json[company]
+            let key = "", file = ""
+            if(dep && !arr) {
+                key = departure
+                file = "PorOrigem"
+            }else if(arr && !dep) {
+                key = arrival
+                file = "PorDestino"
+            }else if(dep && arr) {
+                key = departure+"-"+arrival
+                file = "PorRota"
+            }
+
+            fetch("data/generated/voos"+file+"Dia.json").then(res => res.json()).then(function(json) {
+                let flights = json[key]
+                if(flights == null) flights = {}
                 let flightsKeys = Object.keys(flights)
                 flightsKeys.sort()
                 let flightsSorted = {}
-                for(let k in flightsKeys) {
+                for (let k in flightsKeys) {
                     let key = flightsKeys[k]
                     flightsSorted[key] = flights[key]
                 }
@@ -116,62 +148,39 @@
                 let mean_ys = []
                 let sum_array = []
                 let sum = 0
-                for(let d in flightsSorted) {
-                    if(!flightsSorted.hasOwnProperty(d)) continue;
+                for (let d in flightsSorted) {
+                    if (!flightsSorted.hasOwnProperty(d)) continue;
                     sum += flightsSorted[d]
                     let num = parseInt(d)
-                    if(num > 1417392000) { //Check if the date is after 01-12-2014
+                    if (num > 1417392000) { //Check if the date is after 01-12-2014
                         xs.push(num)
                         day_ys.push(flightsSorted[num])
                         sum_array.unshift(flightsSorted[num])
-                        if(sum_array.length > 7) {
+                        if (sum_array.length > 7) {
                             sum_array.pop()
                         }
                         let sum = 0
-                        for(let s in sum_array) {
-                            if(!sum_array.hasOwnProperty(s)) continue;
+                        for (let s in sum_array) {
+                            if (!sum_array.hasOwnProperty(s)) continue;
                             sum += sum_array[s]
                         }
-                        mean_ys.push(Math.floor(sum/sum_array.length))
+                        mean_ys.push(Math.floor(sum / sum_array.length))
                     }
                 }
 
                 new CountUp('flights', sum).start();
                 createFlightGraph("flightGraph", xs, mean_ys, day_ys)
 
-                fetch("data/generated/voosAtrasadosPorEmpresa.json").then(res => res.json()).then(function(subJson) {
-                    new CountUp('delayedFlights', subJson[company]).start();
-                    document.getElementById("delayedFlightsPercentage").innerText = "(" + ((subJson[company]/sum)*100).toFixed(2) + "%)"
+                fetch("data/generated/voosAtrasados"+file+".json").then(res => res.json()).then(function(subJson) {
+                    new CountUp('delayedFlights', subJson[key]).start();
+                    document.getElementById("delayedFlightsPercentage").innerText = "(" + ((subJson[key]/sum)*100).toFixed(2) + "%)"
                 })
 
-                fetch("data/generated/voosCanceladosPorEmpresa.json").then(res => res.json()).then(function(subJson) {
-                    new CountUp('cancelledFlights', subJson[company]).start();
-                    document.getElementById("cancelledFlightsPercentage").innerText = "(" + ((subJson[company]/sum)*100).toFixed(2) + "%)"
+                fetch("data/generated/voosCancelados"+file+".json").then(res => res.json()).then(function(subJson) {
+                    new CountUp('cancelledFlights', subJson[key]).start();
+                    document.getElementById("cancelledFlightsPercentage").innerText = "(" + ((subJson[key]/sum)*100).toFixed(2) + "%)"
                 })
-
-                fetch("data/generated/voosPorEmpresaOrigem.json").then(res => res.json()).then(function(subJson) {
-                    let departures = subJson[company]
-                    let mostCommon = getMostCommon(departures)
-                    document.getElementById("departure").innerText = mostCommon[0]
-                    document.getElementById("departureFlights").innerText = mostCommon[1] + " Voos"
-                })
-
-                fetch("data/generated/voosPorEmpresaDestino.json").then(res => res.json()).then(function(subJson) {
-                    let arrivals = subJson[company]
-                    let mostCommon = getMostCommon(arrivals)
-                    document.getElementById("arrival").innerText = mostCommon[0]
-                    document.getElementById("arrivalFlights").innerText = mostCommon[1] + " Voos"
-                })
-
-                fetch("data/generated/voosPorEmpresaRota.json").then(res => res.json()).then(function(subJson) {
-                    let routes = subJson[company]
-                    let mostCommon = getMostCommon(routes)
-                    document.getElementById("route").innerText = mostCommon[0]
-                    document.getElementById("routeFlights").innerText = mostCommon[1] + " Voos"
-                })
-
-
-            })
+            });
         }
     </script>
 </html>
