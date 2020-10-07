@@ -1,6 +1,7 @@
-<html>
+<html lang="pt-BR">
     <head>
         <link rel="stylesheet" href="style.css">
+        <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>ANAC 2015-2020</title>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3"></script>
@@ -21,17 +22,25 @@
             </div>
             <div class="content">
                 <div class = "box">
-                    <p>Entre 31 de Dezembro de 2014 e 3 de Agosto de 2020 um total <h1 id="flightCounter1">0</h1> voos foram registrados no Brasil.</p>
+                    <p>Entre 31 de Dezembro de 2014 e 3 de Agosto de 2020 um total <span class="counter" id="flightCounter1">0</span> voos foram registrados no Brasil.</p>
                 </div>
                 <div class="group">
                     <div class = "box">
-                        <p>Entre os <span id="flightCounter2">0</span> voos que aconteceram no nosso pais <h1 id="delayCounter">0</h1> sofreram atrasos. Um total de <h1 id="delayPercentage">0</h1></p>
+                        <p>Entre os <span id="flightCounter2">0</span> voos que aconteceram no nosso pais <span class="counter" id="delayCounter">0</span> sofreram atrasos. Um total de <span class="counter" id="delayPercentage">0</span></p>
                     </div>
                     <div class = "box">
-                        <p>Imprevistos acontecem, e na aviação isso não é diferente. <h1 id="cancelledCounter">0</h1> voos tiveram que ser cancelados ao longo desses 5 anos. Um total de: <h1 id="cancelledPercentage">0</h1></p>
+                        <p>Imprevistos acontecem, e na aviação isso não é diferente. <span class="counter" id="cancelledCounter">0</span> voos tiveram que ser cancelados ao longo desses 5 anos. Um total de: <span class="counter" id="cancelledPercentage">0</span></p>
                     </div>
                     <div class = "box">
-                        <p>A empresa que mais fez voos em território nacional foi a <h1 id="mostUsedCompany"></h1> com um total de <h1 id="mostUsedCompanyFlightCounter">0</h1>voos nacionais e internacionais!</p>
+                        <p>A empresa que mais fez voos em território nacional foi a <span class="counter" id="mostUsedCompany"></span> com um total de <span class="counter" id="mostUsedCompanyFlightCounter">0</span>voos nacionais e internacionais!</p>
+                    </div>
+                </div>
+                <div class="group">
+                    <div class = "box">
+                        <p>O aeroporto mais movimentado do brasil durante esse periodo foi <span class="counter" id="mostUsedAirport"></span> com um total de <span class="counter" id="mostUsedAirportFlightCounter">0</span> voos realizados.</p>
+                    </div>
+                    <div class = "box">
+                        <p>O rota mais utilizada foi <span class="counter" id="mostUsedRoute"></span> com um total de <span class="counter" id="mostUsedRouteFlightCounter">0</span> voos realizados.</p>
                     </div>
                 </div>
                 <div class="box">
@@ -42,10 +51,10 @@
             <div class="space"></div>
             <footer>
                 <div>
-                    <p>Feito por: Carolaine, Elian Luz, Euma Santos e Luca Argolo</br>Dúvidas? Mande um email para <a style="color:cornflowerblue" href="mailto:lucaargolo@gmail.com">lucaargolo@gmail.com</a></p>
+                    <p>Feito por: Carolaine, Elian Luz, Euma Santos e Luca Argolo<br/>Dúvidas? Mande um email para <a style="color:cornflowerblue" href="mailto:lucaargolo@gmail.com">lucaargolo@gmail.com</a></p>
                 </div>
                 <div class="space"></div>
-                <p>Trabalho de MATA62 (Engenharia de Software)</br>2020.3 - UFBA</p>
+                <p>Trabalho de MATA62 (Engenharia de Software)<br/>2020.3 - UFBA</p>
                 <p>    </p>
                 <p><a href="https://github.com/lucaargolo/historico-de-voos">
                     <svg width="40px" height="38px" role="img" viewBox="0 0 24 24">
@@ -57,6 +66,7 @@
     </body>
     <script src="common.js"></script>
     <script type="module">
+        // noinspection JSFileReferences
         import { CountUp } from "https://cdn.jsdelivr.net/npm/countup.js@2.0.7/dist/countUp.min.js"
 
         fetch("data/generated/voosPorEmpresa.json").then(res => res.json()).then(function(json) {
@@ -64,7 +74,9 @@
             let totalFlights = 0
             let mostUsedCompany = null
             let mostUsedCompanyFlightCount = 0
+
             for(let d in json) {
+                if(!json.hasOwnProperty(d)) continue;
                 totalFlights += json[d]
                 let company = d
                 let companyFlightCount = json[d]
@@ -82,7 +94,8 @@
                 
                 let voosAtrasados = 0
                 for(let d in json) {
-                    voosAtrasados += json[d]
+                    if(json.hasOwnProperty(d))
+                        voosAtrasados += json[d]
                 }
                 
                 let delayCounter = new CountUp("delayCounter", voosAtrasados)
@@ -95,7 +108,8 @@
 
                 let voosCancelados = 0
                 for(let d in json) {
-                    voosCancelados += json[d]
+                    if(json.hasOwnProperty(d))
+                        voosCancelados += json[d]
                 }
                 
                 let cancelledCounter = new CountUp("cancelledCounter", voosCancelados)
@@ -114,6 +128,7 @@
             let sum_array = []
             let sum = 0
             for(let d in json) {
+                if(!json.hasOwnProperty(d)) continue;
                 sum += json[d]
                 let num = parseInt(d)
                 if(num > 1417392000) { //Check if the date is after 01-12-2014

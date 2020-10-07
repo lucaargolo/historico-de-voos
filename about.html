@@ -1,11 +1,9 @@
-<html>
+<html lang="pt-br">
     <head>
         <link rel="stylesheet" href="style.css">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8">
         <title>ANAC 2015-2020</title>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3"></script>
-        <script src="https://cdn.jsdelivr.net/npm/moment@2.27.0"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@0.1.1"></script>
     </head>
     <body>
         <div class="page">
@@ -19,15 +17,25 @@
                 <a class="collapse" onclick="collapseTopNav()">...</a>
             </div>
             <div class="content">
-                
+                <div class="box">
+                    <h1>O trabalho</h1>
+                    <p>Este trabalho faz parte de uma atividade da disciplina MATA62 - Engenharia de Software I, da Universidade Federal da Bahia (UFBA). A disciplina é ministrada pelo professor Dr Eduardo Santana Almeida e tem como objetivo  desenvolver uma aplicação para leitura de dados dos voos no Brasil disponibilizados pela ANAC de 2015 até agosto de 2020 e  apresentar um Dasboard.</p>
+                    <h1>A equipe</h1>
+                    <ul>
+                        <li>Carolaine Vieira - Lic. Computação</li>
+                        <li>Elian Luz – Lic. Computação</li>
+                        <li>Euma Santos – Lic. Computação</li>
+                        <li>Luca Argolo – Ciência da Computação</li>
+                </ul>
+                </div>
             </div>
             <div class="space"></div>
             <footer>
                 <div>
-                    <p>Feito por: Carolaine, Elian Luz, Euma Santos e Luca Argolo</br>Dúvidas? Mande um email para <a style="color:cornflowerblue" href="mailto:lucaargolo@gmail.com">lucaargolo@gmail.com</a></p>
+                    <p>Feito por: Carolaine, Elian Luz, Euma Santos e Luca Argolo<br/>Dúvidas? Mande um email para <a style="color:cornflowerblue" href="mailto:lucaargolo@gmail.com">lucaargolo@gmail.com</a></p>
                 </div>
                 <div class="space"></div>
-                <p>Trabalho de MATA62 (Engenharia de Software)</br>2020.3 - UFBA</p>
+                <p>Trabalho de MATA62 (Engenharia de Software)<br/>2020.3 - UFBA</p>
                 <p>    </p>
                 <p><a href="https://github.com/lucaargolo/historico-de-voos">
                     <svg width="40px" height="38px" role="img" viewBox="0 0 24 24">
@@ -37,17 +45,5 @@
             </footer>
         </div>
     </body>
-    <script>
-        function collapseTopNav() {
-            var x = document.getElementById("topnav");
-            if (x.className === "topnav") {
-                x.className += " responsive";
-            } else {
-                x.className = "topnav";
-            }
-        }
-    </script>
-    <script type="module">
-        
-    </script>
+    <script src="common.js"></script>
 </html>

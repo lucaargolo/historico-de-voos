@@ -1,7 +1,8 @@
-<html>
+<html lang="pt-BR">
     <head>
         <link rel="stylesheet" href="style.css">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8">
         <title>ANAC 2015-2020</title>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3"></script>
         <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1"></script>
@@ -32,21 +33,31 @@
                 </div>
                 <div id="content_box" style="display: none;">
                     <div class="box">
-                        <p>Entre <span id="fromDate"></span> e <span id="toDate"></span> um total de <h1 id="flightCounter1">0</h1> voos foram registrados no Brasil.</p>
+                        <p>Entre <span id="fromDate"></span> e <span id="toDate"></span> um total de <span class="counter" id="flightCounter1">0</span> voos foram registrados no Brasil.</p>
+                    </div>
+                    <div class="group">
+                        <div class = "box">
+                            <p>Entre os <span id="flightCounter2">0</span> voos que aconteceram durante essas datas <span class="counter" id="delayCounter">0</span> sofreram atrasos. Um total de <span class="counter" id="delayPercentage">0</span></p>
+                        </div>
+                        <div class = "box">
+                            <p>Imprevistos acontecem, e na aviação isso não é diferente. <span class="counter" id="cancelledCounter">0</span> voos tiveram que ser cancelados ao longo desses 5 anos. Um total de: <span class="counter" id="cancelledPercentage">0</span></p>
+                        </div>
+                        <div class = "box">
+                            <p>A empresa que mais fez voos durante esse período foi a <span class="counter" id="mostUsedCompany"></span> com um total de <span class="counter" id="mostUsedCompanyFlightCounter">0</span>voos nacionais e internacionais!</p>
+                        </div>
                     </div>
                     <div class="box">
                         <canvas id="flightGraph"></canvas>
-
                     </div>
                 </div>
             </div>
             <div class="space"></div>
             <footer>
                 <div>
-                    <p>Feito por: Carolaine, Elian Luz, Euma Santos e Luca Argolo</br>Dúvidas? Mande um email para <a style="color:cornflowerblue" href="mailto:lucaargolo@gmail.com">lucaargolo@gmail.com</a></p>
+                    <p>Feito por: Carolaine, Elian Luz, Euma Santos e Luca Argolo<br/>Dúvidas? Mande um email para <a style="color:cornflowerblue" href="mailto:lucaargolo@gmail.com">lucaargolo@gmail.com</a></p>
                 </div>
                 <div class="space"></div>
-                <p>Trabalho de MATA62 (Engenharia de Software)</br>2020.3 - UFBA</p>
+                <p>Trabalho de MATA62 (Engenharia de Software)<br/>2020.3 - UFBA</p>
                 <p>    </p>
                 <p><a href="https://github.com/lucaargolo/historico-de-voos">
                     <svg width="40px" height="38px" role="img" viewBox="0 0 24 24">
@@ -57,6 +68,7 @@
         </div>
     </body>
     <script src="common.js"></script>
+    <!--suppress JSFileReferences -->
     <script type="module">
         import { CountUp } from "https://cdn.jsdelivr.net/npm/countup.js@2.0.7/dist/countUp.min.js"
 
@@ -70,13 +82,13 @@
             document.getElementById("date_box").style = "display: none;"
             document.getElementById("content_box").style = "display: flex; flex-direction: column;"
 
+            document.getElementById("fromDate").innerText = moment(fromDate, "x").format("LL")
+            document.getElementById("toDate").innerText = moment(toDate, "x").format("LL")
+
             fetch("data/generated/voosPorDia.json").then(res => res.json()).then(function(json) {
-                let xs = []
-                let day_ys = []
-                let mean_ys = []
-                let sum_array = []
-                let total_sum = 0
+                let xs = [], day_ys = [], mean_ys = [], sum_array = [], total_sum = 0
                 for(let d in json) {
+                    if(!json.hasOwnProperty(d)) continue;
                     let num = parseInt(d)
                     if(num >= fromDate && num <= toDate) {
                         total_sum += json[d]
@@ -88,20 +100,38 @@
                         }
                         let sum = 0
                         for(let s in sum_array) {
+                            if(!sum_array.hasOwnProperty(s)) continue;
                             sum += sum_array[s]
                         }
                         mean_ys.push(Math.floor(sum/sum_array.length))
                     }
                 }
 
-                let flightCounter1 = new CountUp('flightCounter1', total_sum);
-                flightCounter1.start();
-
+                new CountUp('flightCounter1', total_sum).start();
                 createFlightGraph("flightGraph", xs, mean_ys, day_ys)
             });
 
-            document.getElementById("fromDate").innerText = moment(fromDate, "x").format("LL")
-            document.getElementById("toDate").innerText = moment(toDate, "x").format("LL")
+            fetch("data/generated/voosPorEmpresaDia.json").then(res => res.json()).then(function(json) {
+                let empresaComMaisVoos = "", qntMaisVoos = 0;
+                for(let empresa in json) {
+                    if(!json.hasOwnProperty(empresa)) continue;
+                    let sumVoos = 0;
+                    let dias = json[empresa]
+                    for(let dia in dias) {
+                        if(!dias.hasOwnProperty(dia)) continue;
+                        let diaNum = parseInt(dia)
+                        if(diaNum >= fromDate && diaNum <= toDate) {
+                            sumVoos += dias[dia]
+                        }
+                    }
+                    if(sumVoos > qntMaisVoos) {
+                        qntMaisVoos = sumVoos
+                        empresaComMaisVoos = empresa
+                    }
+                }
+                document.getElementById("mostUsedCompany").innerText = empresaComMaisVoos
+                new CountUp('mostUsedCompanyFlightCounter', qntMaisVoos).start();
+            })
         }
     </script>
 </html>

@@ -25,9 +25,7 @@ class Voo {
 
 //Função simples para pegar o objeto e salvar na pasta data/generated em formato json
 function writeObject(obj, name) {
-    fs.writeFileSync('data/generated/'+name, JSON.stringify(obj), function (err) {
-        if (err) return console.log(err);
-    });
+    fs.writeFileSync('data/generated/'+name, JSON.stringify(obj));
 }
 
 //Função que pega o formato de data utilizado pela ANAC e converte para ISO 8601
@@ -43,7 +41,7 @@ function parseWeirdDateFormat(dateString) {
         let year = secondArray[0]
 
         let hour = secondArray[1]
-        if(hour.length != 5) hour = "0"+hour
+        if(hour.length !== 5) hour = "0"+hour
 
         return Date.parse(year+'-'+month+'-'+day+'T'+hour+"Z")
     }
@@ -71,14 +69,13 @@ function parseCsvLine(csvLine, lineNumber) {
     Caso o código não seja valido, manda um erro que interrompe a leitura da tabela.
     */
     let icaoEmpresa = flightData[0].match(/[A-Z]{3}/g)
-    if(icaoEmpresa == null || icaoEmpresa.join("") != flightData[0]) {
-        console.error(flightData[0])
+    if(icaoEmpresa == null || icaoEmpresa.join("") !== flightData[0]) {
         throw "Erro ao tentar ler ICAO da Empresa Aérea \""+flightData[0]+"\" na linha "+lineNumber+"! \""+csvLine+"\"";
     }
 
     //Testa o segundo elemento do array para verificar se o numero de voo é válido
     let numeroVoo = flightData[1]
-    if(isNaN(numeroVoo) && !(numeroVoo.startsWith("Z") && !isNaN(numeroVoo.substring(1)))) {
+    if(numeroVoo.length > 0 && isNaN(parseInt(numeroVoo)) && !(numeroVoo.startsWith("Z") && !isNaN(parseInt(numeroVoo.substring(1))))) {
         throw "Erro ao tentar ler número de voo \""+flightData[1]+"\" na linha "+lineNumber+"! \""+csvLine+"\"";
     }
 
@@ -86,7 +83,7 @@ function parseCsvLine(csvLine, lineNumber) {
     let digitoIdentificador = flightData[2].match(/^[0123456789DABE]/g)
     if(!flightData[2].replace(/\s/g, '').length) {
         flightData[2] = ""
-    }else if(digitoIdentificador == null || digitoIdentificador.join("") != flightData[2]) {
+    }else if(digitoIdentificador == null || digitoIdentificador.join("") !== flightData[2]) {
         throw "Erro ao tentar ler dígito identificador \""+flightData[2]+"\" na linha "+lineNumber+"! \""+csvLine+"\""
     }
 
@@ -94,16 +91,16 @@ function parseCsvLine(csvLine, lineNumber) {
     let tipoDeLinha = flightData[3].match(/^[NCIGLREHX]/g)
     if(!flightData[3].replace(/\s/g, '').length) {
         flightData[3] = ""
-    }else if(tipoDeLinha == null || tipoDeLinha.join("") != flightData[3] ) {
+    }else if(tipoDeLinha == null || tipoDeLinha.join("") !== flightData[3] ) {
         throw "Erro ao tentar ler tipo de linha \""+flightData[3]+"\" na linha "+lineNumber+"! \""+csvLine+"\""
     }
 
     //Testa o décimo primeiro elemento do array para verificar se o voo foi realizado ou cancelado
     let situacaoVoo = flightData[10].toUpperCase().replace("Ã", "A").replace("NAO REALIZADO", "CANCELADO")
-    if(situacaoVoo != "REALIZADO" && situacaoVoo != "CANCELADO" && situacaoVoo != "NAO INFORMADO") {
+    if(situacaoVoo !== "REALIZADO" && situacaoVoo !== "CANCELADO" && situacaoVoo !== "NAO INFORMADO") {
         throw "Erro ao tentar ler Situação de Vôo \""+flightData[10]+"\" na linha "+lineNumber+"! \""+csvLine+"\""
     }
-    let cancelado = (situacaoVoo == "CANCELADO")
+    let cancelado = (situacaoVoo === "CANCELADO")
 
     /*
     Testa o décimo segundo elemento do array para verificar se um código de justificativa foi informado e se o mesmo é válido
@@ -111,8 +108,8 @@ function parseCsvLine(csvLine, lineNumber) {
     */
     let codigoJustificativa = ""
     if(flightData.size >= 12) {
-        let codigoJustificativa = flightData[11].match(/[A-Z]{2}/g)
-        if(codigoJustificativa != null && codigoJustificativa.join("") == flightData[11]) {
+        codigoJustificativa = flightData[11].match(/[A-Z]{2}/g)
+        if(codigoJustificativa != null && codigoJustificativa.join("") === flightData[11]) {
             codigoJustificativa = flightData[11]
         }else{
             codigoJustificativa = ""
@@ -121,7 +118,7 @@ function parseCsvLine(csvLine, lineNumber) {
 
     //Testa o quinto elemento do array para verificar se o código do aeroporto de partida é valido
     let icaoOrigem = flightData[4].match(/[A-Z]{4}/g)
-    if(icaoOrigem == null || icaoOrigem.join("") != flightData[4]) {
+    if(icaoOrigem == null || icaoOrigem.join("") !== flightData[4]) {
         throw "Erro ao tentar ler ICAO Origem \""+flightData[4]+"\" na linha "+lineNumber+"! \""+csvLine+"\""
     }
 
@@ -132,7 +129,7 @@ function parseCsvLine(csvLine, lineNumber) {
     let icaoDestino = flightData[5].match(/[A-Z]{4}/g)
     if(!flightData[5].replace(/\s/g, '').length) {
         return new Voo(flightData[0], flightData[1], flightData[2], flightData[3], flightData[4], flightData[5], 0, 0, 0, 0, situacaoVoo, codigoJustificativa)
-    }else if(icaoDestino == null || icaoDestino.join("") != flightData[5]) {
+    }else if(icaoDestino == null || icaoDestino.join("") !== flightData[5]) {
         throw "Erro ao tentar ler ICAO Destino \""+flightData[5]+"\" na linha "+lineNumber+"! \""+csvLine+"\""
     }
 
@@ -173,6 +170,8 @@ let voosCanceladosPorEmpresa = {}
 let voosAtrasadosPorEmpresa = {}
 let voosPorDia = {}
 let voosPorEmpresaDia = {}
+let voosCanceladosPorDia = {}
+let voosAtrasadosPorDia = {}
 
 let voosPorOrigem = {}
 let voosPorOrigemDia = {}
@@ -196,7 +195,7 @@ let voosPorEmpresaRota = {}
 function handleVoo(voo) {
 
     let unix = voo.partidaPrevista
-    if(isNaN(unix) || unix == 0) {
+    if(isNaN(unix) || unix === 0) {
         unix = voo.partidaReal
         if(isNaN(unix)) {
             unix = 0
@@ -282,11 +281,15 @@ function handleVoo(voo) {
     voosPorEmpresaRota[empresa][rota]++
     voosPorEmpresa[empresa]++
 
-    if(voo.situacaoVoo == "CANCELADO") {
+    if(voo.situacaoVoo === "CANCELADO") {
         if(isNaN(voosCanceladosPorEmpresa[empresa])) {
             voosCanceladosPorEmpresa[empresa] = 0
         }
         voosCanceladosPorEmpresa[empresa]++
+        if(isNaN(voosCanceladosPorDia[dayDate.getTime()])) {
+            voosCanceladosPorDia[dayDate.getTime()] = 0
+        }
+        voosCanceladosPorDia[dayDate.getTime()]++
         if(isNaN(voosCanceladosPorOrigem[origem])) {
             voosCanceladosPorOrigem[origem] = 0
         }
@@ -306,6 +309,10 @@ function handleVoo(voo) {
             voosAtrasadosPorEmpresa[empresa] = 0
         }
         voosAtrasadosPorEmpresa[empresa]++
+        if(isNaN(voosAtrasadosPorDia[dayDate.getTime()])) {
+            voosAtrasadosPorDia[dayDate.getTime()] = 0
+        }
+        voosAtrasadosPorDia[dayDate.getTime()]++
         if(isNaN(voosAtrasadosPorOrigem[origem])) {
             voosAtrasadosPorOrigem[origem] = 0
         }
@@ -356,7 +363,7 @@ files.forEach(function (file) {
 let voosPorDiaKeys = Object.keys(voosPorDia)
 voosPorDiaKeys.sort()
 let voosPorDiaSorted = {}
-for(k in voosPorDiaKeys) {
+for(let k in voosPorDiaKeys) {
     let key = voosPorDiaKeys[k]
     voosPorDiaSorted[key] = voosPorDia[key]
 }
@@ -367,6 +374,8 @@ writeObject(voosPorEmpresa, "voosPorEmpresa.json")
 writeObject(voosAtrasadosPorEmpresa, "voosAtrasadosPorEmpresa.json")
 writeObject(voosCanceladosPorEmpresa, "voosCanceladosPorEmpresa.json")
 writeObject(voosPorEmpresaDia, "voosPorEmpresaDia.json")
+writeObject(voosAtrasadosPorDia, "voosAtrasadosPorDia.json")
+writeObject(voosCanceladosPorDia, "voosCanceladosPorDia.json")
 writeObject(voosPorOrigem, "voosPorOrigem.json")
 writeObject(voosPorOrigemDia, "voosPorOrigemDia.json")
 writeObject(voosCanceladosPorOrigem, "voosCanceladosPorOrigem.json")
